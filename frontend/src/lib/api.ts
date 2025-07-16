@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://ai-powered-resume-builder-e7t8.onrender.com";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://ai-powered-resume-builder-e7t8.onrender.com/api";
 
 // Auth token management
 const getAuthToken = () => localStorage.getItem('authToken');
