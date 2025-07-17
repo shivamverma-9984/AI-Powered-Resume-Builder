@@ -1,5 +1,6 @@
 import React from 'react';
 import { FileText, Lightbulb } from 'lucide-react';
+import { aiAPI } from '../../../lib/ai';
 
 interface SummaryFormProps {
   data: string;

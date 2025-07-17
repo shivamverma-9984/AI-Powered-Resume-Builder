@@ -18,7 +18,7 @@ app.use(cors({
   origin:[
   //  process.env.CLIENT_URL,
   'http://localhost:5173',
-  'https://ai-powered-resume-builder-eight.vercel.app'
+  'https://resumehive.vercel.app'
 ],
   credentials: true
 }));

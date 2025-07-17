@@ -48,9 +48,6 @@ const ResumeBuilder: React.FC = () => {
   }, [id]);
 
 
-// ...existing code...
-
-// Track last saved state to avoid unnecessary saves
 const [lastSaved, setLastSaved] = useState({
   resumeData: resumeData,
   resumeTitle: resumeTitle,
@@ -76,7 +73,7 @@ useEffect(() => {
         resumeTitle,
         templateId,
       });
-    }, 1500); // shorter debounce for better UX
+    }, 1500); 
 
     return () => clearTimeout(autoSaveTimer);
   }
@@ -91,18 +88,13 @@ const handleAutoSave = async () => {
       templateId,
       content: resumeData,
     });
-    // Optionally show a subtle toast or indicator
-    // toast.success('Auto-saved!');
+   
   } catch (error) {
     console.error('Auto-save error:', error);
-    // Optionally show error toast
-    // toast.error('Auto-save failed');
+   
   }
 };
 
-// ...existing code...
-  
-  // Auto-save functionality
   useEffect(() => {
     if (autoSaveEnabled && user && resumeData.personalInfo.fullName && resumeId) {
       const autoSaveTimer = setTimeout(() => {

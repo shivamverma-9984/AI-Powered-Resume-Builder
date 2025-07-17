@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Project } from '../../../types';
-import { Plus, Trash2, Trophy, ExternalLink, Github } from 'lucide-react';
+import { Plus, Trash2, Trophy, ExternalLink, Github, List } from 'lucide-react';
 
 interface ProjectsFormProps {
   data: Project[];
@@ -9,6 +9,7 @@ interface ProjectsFormProps {
 
 const ProjectsForm: React.FC<ProjectsFormProps> = ({ data, onChange }) => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [techInputs, setTechInputs] = useState<Record<string, string>>({});
 
   const addProject = () => {
     const newProject: Project = {
@@ -23,10 +24,16 @@ const ProjectsForm: React.FC<ProjectsFormProps> = ({ data, onChange }) => {
     };
     onChange([...data, newProject]);
     setExpandedItem(newProject.id);
+    setTechInputs(prev => ({ ...prev, [newProject.id]: '' }));
   };
 
   const removeProject = (id: string) => {
     onChange(data.filter(project => project.id !== id));
+    setTechInputs(prev => {
+      const newTechInputs = { ...prev };
+      delete newTechInputs[id];
+      return newTechInputs;
+    });
   };
 
   const updateProject = (id: string, field: keyof Project, value: any) => {
@@ -36,8 +43,36 @@ const ProjectsForm: React.FC<ProjectsFormProps> = ({ data, onChange }) => {
   };
 
   const handleTechnologiesChange = (id: string, techString: string) => {
-    const technologies = techString.split(',').map(tech => tech.trim()).filter(tech => tech);
+    setTechInputs(prev => ({ ...prev, [id]: techString }));
+    
+    // Update the actual technologies array when input loses focus
+    if (!techString.trim()) {
+      updateProject(id, 'technologies', []);
+      return;
+    }
+    
+    const technologies = techString.split(',')
+      .map(tech => tech.trim())
+      .filter(tech => tech);
     updateProject(id, 'technologies', technologies);
+  };
+
+  const handleTechBlur = (id: string) => {
+    const techString = techInputs[id] || '';
+    const technologies = techString.split(',')
+      .map(tech => tech.trim())
+      .filter(tech => tech);
+    updateProject(id, 'technologies', technologies);
+  };
+
+  const addBulletPoint = (id: string) => {
+    const project = data.find(p => p.id === id);
+    if (!project) return;
+
+    const newDescription = project.description 
+      ? `${project.description}\n• `
+      : '• ';
+    updateProject(id, 'description', newDescription);
   };
 
   return (
@@ -113,8 +148,9 @@ const ProjectsForm: React.FC<ProjectsFormProps> = ({ data, onChange }) => {
                       </label>
                       <input
                         type="text"
-                        value={project.technologies.join(', ')}
+                        value={techInputs[project.id] || project.technologies.join(', ')}
                         onChange={(e) => handleTechnologiesChange(project.id, e.target.value)}
+                        onBlur={() => handleTechBlur(project.id)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="React, Node.js, MongoDB"
                       />
@@ -182,13 +218,23 @@ const ProjectsForm: React.FC<ProjectsFormProps> = ({ data, onChange }) => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Project Description *
                     </label>
-                    <textarea
-                      value={project.description}
-                      onChange={(e) => updateProject(project.id, 'description', e.target.value)}
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Describe your project, its features, and your role..."
-                    />
+                    <div className="relative">
+                      <textarea
+                        value={project.description}
+                        onChange={(e) => updateProject(project.id, 'description', e.target.value)}
+                        rows={4}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Describe your project, its features, and your role..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => addBulletPoint(project.id)}
+                        className="absolute right-2 bottom-2 p-1 text-gray-500 hover:text-gray-700"
+                        title="Add bullet point"
+                      >
+                        <List className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

@@ -384,15 +384,15 @@ const FeaturesPage: React.FC = () => {
         <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-full animate-bounce delay-700"></div>
         <div className="absolute bottom-40 left-20 w-12 h-12 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl rotate-45 animate-bounce delay-1000"></div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-          <div className="mb-8">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10 mt-2">
+          <div className="mb-6">
             <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full text-sm font-medium text-purple-800 mb-8 animate-fade-in">
               <Sparkles className="w-4 h-4 mr-2" />
               Advanced AI Features
             </div>
           </div>
           
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl  font-bold mb-6 leading-tight">
             <span className="block bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent">
               Powerful Features
             </span>
@@ -401,15 +401,15 @@ const FeaturesPage: React.FC = () => {
             </span>
           </h1>
           
-          <p className="text-xl sm:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed font-light">
+          <p className="text-xl text-gray-600 mb-10 max-w-4xl mx-auto leading-relaxed font-light">
             Discover how ResumeAI's revolutionary features help you create compelling resumes 
             that captivate employers and dominate ATS systems.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link
               to="/signup"
-              className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-12 py-5 rounded-2xl text-xl font-bold hover:from-purple-700 hover:to-pink-700 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25"
+              className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-12 py-3.5 rounded-2xl text-xl font-bold hover:from-purple-700 hover:to-pink-700 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <span className="relative flex items-center">
@@ -420,7 +420,7 @@ const FeaturesPage: React.FC = () => {
             
             <Link
               to="/templates"
-              className="group relative bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 px-12 py-5 rounded-2xl text-xl font-bold hover:bg-white hover:border-purple-300 hover:text-purple-700 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+              className="group relative bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 px-12 py-3.5 rounded-2xl text-xl font-bold hover:bg-white hover:border-purple-300 hover:text-purple-700 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
             >
               <span className="flex items-center">
                 <Layers className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform duration-300" />
@@ -449,14 +449,14 @@ const FeaturesPage: React.FC = () => {
       </section>
 
       {/* Main Features */}
-      <section className="relative py-32 bg-gradient-to-b from-white to-gray-50">
+      <section className="relative py-24 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full text-sm font-medium text-blue-800 mb-8">
               <Rocket className="w-4 h-4 mr-2" />
               Core Features
             </div>
-            <h2 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
+            <h2 className="text-5xl font-bold text-gray-900 mb-4">
               Revolutionary
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"> AI Technology</span>
             </h2>
@@ -467,15 +467,15 @@ const FeaturesPage: React.FC = () => {
 
           <div className="space-y-32">
             {mainFeatures.map((feature, index) => (
-              <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-16`}>
+              <div key={index} className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-14`}>
                 <div className="flex-1 group">
                   <div className="relative">
                     <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgColor} rounded-3xl transform rotate-1 group-hover:rotate-2 transition-transform duration-300`}></div>
                     <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/20 transform hover:-translate-y-2 transition-all duration-500">
-                      <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg`}>
+                      <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg`}>
                         <feature.icon className="h-8 w-8 text-white" />
                       </div>
-                      <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 group-hover:text-purple-700 transition-colors duration-300">
+                      <h3 className="text-3xl font-bold text-gray-900 mb-3 group-hover:text-purple-700 transition-colors duration-300">
                         {feature.title}
                       </h3>
                       <p className="text-lg text-gray-600 mb-8 leading-relaxed">
@@ -514,14 +514,14 @@ const FeaturesPage: React.FC = () => {
       </section>
 
       {/* Additional Features Grid */}
-      <section className="relative py-32 bg-gradient-to-br from-gray-50 to-white">
+      <section className="relative py-20 bg-gradient-to-br from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-100 to-blue-100 rounded-full text-sm font-medium text-green-800 mb-8">
               <Star className="w-4 h-4 mr-2" />
               Additional Features
             </div>
-            <h2 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
+            <h2 className="text-5xl  font-bold text-gray-900 mb-4">
               Everything You
               <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent"> Need & More</span>
             </h2>
@@ -604,10 +604,10 @@ const FeaturesPage: React.FC = () => {
             Join the revolution and create resumes that don't just get noticed—they get you hired.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               to="/signup"
-              className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-12 py-6 rounded-2xl text-xl font-bold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25"
+              className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-12 py-3.5 rounded-2xl text-xl font-bold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <span className="relative flex items-center">
@@ -618,7 +618,7 @@ const FeaturesPage: React.FC = () => {
             
             <Link
               to="/templates"
-              className="group relative bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 px-12 py-6 rounded-2xl text-xl font-bold hover:bg-white hover:border-purple-300 hover:text-purple-700 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+              className="group relative bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 px-12 py-3.5 rounded-2xl text-xl font-bold hover:bg-white hover:border-purple-300 hover:text-purple-700 transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
             >
               <span className="flex items-center">
                 <Eye className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform duration-300" />
