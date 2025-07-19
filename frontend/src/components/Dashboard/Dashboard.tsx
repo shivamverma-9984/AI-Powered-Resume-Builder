@@ -692,7 +692,7 @@ const Dashboard: React.FC = () => {
                         {resume.atsScore && (
                           <div className={`flex items-center text-sm font-semibold ${getAtsScoreColor(resume.atsScore)}`}>
                             <Target className="w-4 h-4 mr-1" />
-                            <span>{resume.atsScore}% ATS</span>
+                            <span>{resume.atsScore-5}% ATS</span>
                           </div>
                         )}
                       </div>

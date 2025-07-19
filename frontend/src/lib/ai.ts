@@ -1,15 +1,17 @@
-// AI service for resume enhancement
+// AI service for resume enhancement and job description analysis
 export class AIService {
   private apiKey: string;
   private baseUrl: string;
 
   constructor() {
     this.apiKey = import.meta.env.VITE_OPENAI_API_KEY || '';
-    this.baseUrl = 'https://api.openai.com/v1';
+    this.baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyD1jF4zbfdfMXFcKWiewoBqq7cMZ9zNzjo';
   }
 
   async enhanceResume(content: string, jobDescription?: string) {
     try {
+      console.log("kkk--", this.baseUrl);
+
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -33,6 +35,8 @@ export class AIService {
       });
 
       const data = await response.json();
+      console.log("data---", data);
+      
       return {
         suggestions: data.choices[0].message.content.split('\n').filter(Boolean),
         optimizedContent: data.choices[0].message.content,
@@ -89,6 +93,52 @@ export class AIService {
       };
     }
   }
+
+  async extractTechnologies(jobDescription: string) {
+    try {
+      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a tech stack analyzer. Extract all technologies mentioned in the job description and return them as a JavaScript array. Only return the array, nothing else.',
+            },
+            {
+              role: 'user',
+              content: `Extract technologies from this job description in array format:\n\n${jobDescription}`,
+            },
+          ],
+          max_tokens: 500,
+          temperature: 0.3, // Lower temperature for more deterministic output
+        }),
+      });
+
+      const data = await response.json();
+      
+      const content = data.choices[0].message.content;
+      
+      // Try to parse the response as an array
+      try {
+        // Handle cases where the response might be a string representation of an array
+        const techArray = content.startsWith('[') ? JSON.parse(content) : content.split('\n').map(item => item.trim()).filter(Boolean);
+        return techArray;
+      } catch (e) {
+        console.warn('Failed to parse technologies array, returning raw content');
+        return [content];
+      }
+    } catch (error) {
+      console.error('Technology extraction error:', error);
+      return [];
+    }
+  }
+
+
 }
 
 export const aiService = new AIService();

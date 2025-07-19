@@ -26,6 +26,8 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ data, onChange }) => {
     try {
       const resumeContent = generateResumeText();
       const response = await aiService.enhanceResume(resumeContent, jobDescription);
+      console.log("suggestion---",response.suggestions);
+      
       
       setSuggestions(response.suggestions);
       setAtsScore(response.atsScore);

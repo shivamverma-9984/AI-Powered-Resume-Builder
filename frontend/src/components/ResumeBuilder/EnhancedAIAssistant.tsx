@@ -13,7 +13,8 @@ import {
   TrendingUp,
   Award,
   Lightbulb,
-  MessageSquare
+  MessageSquare,
+  Code
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
@@ -30,9 +31,10 @@ const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({ data, onChang
   const [targetRole, setTargetRole] = useState('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [atsScore, setAtsScore] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<'enhance' | 'ats' | 'suggestions' | 'keywords'>('enhance');
+  const [activeTab, setActiveTab] = useState<'enhance' | 'ats' | 'suggestions' | 'keywords' | 'tech'>('enhance');
   const [aiResponse, setAiResponse] = useState<string>('');
   const [keywords, setKeywords] = useState<string[]>([]);
+  const [techStack, setTechStack] = useState<string[]>([]);
 
   const handleEnhanceResume = async () => {
     if (!resumeId) {
@@ -114,12 +116,47 @@ const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({ data, onChang
       const response = await aiAPI.getKeywordSuggestions({
         jobDescription,
         resumeId: resumeId || undefined
-      });
-      
+      });      
       setKeywords(response.keywords || []);
       toast.success('Keyword analysis complete!');
     } catch (error: any) {
       toast.error('Failed to analyze keywords');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTechExtraction = async () => {
+    if (!jobDescription.trim()) {
+      toast.error('Please enter a job description to extract technologies');
+      return;
+    }
+
+    setLoading(true);
+    try {
+    const payload ={
+      "contents": [
+      {
+        "parts": [
+          {
+            "text":  `Extract technologies from this job description in array format kept in mind don't provide unneccessary content only array format:${jobDescription}`
+          }
+        ]
+      }
+    ]
+
+      }
+      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyD1jF4zbfdfMXFcKWiewoBqq7cMZ9zNzjo',{
+        method:"Post",
+        body:JSON.stringify(payload)
+      });
+      const data=await response.json()
+      const result=JSON.parse(data.candidates[0].content.parts[0].text);
+      setTechStack(Array.isArray(result) ? result : []);
+      toast.success('Technologies extracted successfully!');
+    } catch (error: any) {
+      toast.error('Failed to extract technologies');
+      console.error('Tech extraction error:', error);
     } finally {
       setLoading(false);
     }
@@ -249,7 +286,7 @@ const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({ data, onChang
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className={`text-4xl font-bold ${getATSScoreColor(atsScore)}`}>
-                  {atsScore}%
+                  {atsScore-5}%
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">ATS Compatibility Score</div>
@@ -381,6 +418,7 @@ const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({ data, onChang
 
           <button
             onClick={handleKeywordAnalysis}
+            // onClick={handleTechExtraction}
             disabled={loading || !jobDescription.trim()}
             className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
@@ -508,6 +546,96 @@ const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({ data, onChang
           </div>
         )}
       </div>
+    ),
+
+    tech: (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-orange-50 to-yellow-50 p-6 rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Code className="h-5 w-5 mr-2 text-orange-600" />
+            Tech Stack Analyzer
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Extract all technologies mentioned in a job description to better tailor your resume.
+          </p>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Job Description *
+            </label>
+            <textarea
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              rows={6}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Paste the job description here to extract technologies..."
+            />
+          </div>
+
+          <button
+            onClick={handleTechExtraction}
+            disabled={loading || !jobDescription.trim()}
+            className="w-full bg-gradient-to-r from-orange-600 to-yellow-600 text-white py-3 px-4 rounded-lg hover:from-orange-700 hover:to-yellow-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          >
+            {loading ? (
+              <>
+                <Loader className="h-5 w-5 mr-2 animate-spin" />
+                Extracting Technologies...
+              </>
+            ) : (
+              <>
+                <Code className="h-5 w-5 mr-2" />
+                Extract Technologies
+              </>
+            )}
+          </button>
+        </div>
+
+        {techStack.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white border border-gray-200 rounded-lg p-6"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-semibold text-gray-900">Identified Technologies</h4>
+              <button
+                onClick={() => setTechStack([])}
+                className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+              >
+                <RefreshCw className="h-4 w-4 mr-1" />
+                Clear
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {techStack.map((tech, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="bg-orange-50 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium flex items-center"
+                  >
+                    <Code className="h-4 w-4 mr-2" />
+                    {tech}
+                  </motion.div>
+                ))}
+              </div>
+              
+              <div className="pt-4 mt-4 border-t border-gray-200">
+                <h5 className="text-sm font-medium text-gray-700 mb-2">How to use this:</h5>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Add missing technologies to your skills section</li>
+                  <li>• Highlight relevant technologies in your experience bullets</li>
+                  <li>• Use these keywords in your resume summary</li>
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
     )
   };
 
@@ -530,6 +658,7 @@ const EnhancedAIAssistant: React.FC<EnhancedAIAssistantProps> = ({ data, onChang
           { id: 'enhance', label: 'Enhance Resume', icon: Sparkles },
           { id: 'ats', label: 'ATS Optimization', icon: Target },
           { id: 'keywords', label: 'Smart Keywords', icon: Lightbulb },
+          { id: 'tech', label: 'Tech Stack', icon: Code },
           { id: 'suggestions', label: 'Suggestions', icon: MessageSquare }
         ].map((tab) => (
           <button

@@ -122,13 +122,19 @@ export const aiAPI = {
       body: JSON.stringify(data),
     }),
 
-  getKeywordSuggestions: (data: { jobDescription: string; resumeId?: string }) =>
+  extractTechnologies: (data: string) =>
+    apiRequest('/ai/optimize-skills', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  getKeywordSuggestions: (data: string) =>
     apiRequest('/ai/keywords', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
-  getStats: () => apiRequest('/ai/stats'),
+  getStats: () => apiRequest('/ai/skills'),
 };
 
 // User API

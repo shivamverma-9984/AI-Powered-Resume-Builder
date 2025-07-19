@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Skill } from '../../../types';
-import { Plus, Trash2, Code, X } from 'lucide-react';
+import { Plus, Code, X } from 'lucide-react';
 
 interface SkillsFormProps {
   data: Skill[];
