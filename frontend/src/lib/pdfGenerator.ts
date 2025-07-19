@@ -1,54 +1,94 @@
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import { ResumeContent } from "../types"
-
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { ResumeContent } from "../types";
 
 export class PDFGenerator {
-  static async generatePDF(resumeData: ResumeContent, templateId: string = 'modern'): Promise<void> {
+  static async generatePDF(
+    resumeData: ResumeContent,
+    templateId: string = "modern"
+  ): Promise<void> {
     try {
-      const container = document.createElement('div');
+      const container = document.createElement("div");
       container.innerHTML = this.generateResumeHTML(resumeData);
-      container.style.position = 'absolute';
-      container.style.left = '-9999px';
-      container.style.top = '-9999px';
-      container.style.width = '794px';
-      container.style.backgroundColor = 'white';
-      container.style.padding = '20px';
+      container.style.position = "absolute";
+      container.style.left = "-9999px";
+      container.style.top = "-9999px";
+      container.style.width = "210mm"; // A4 width
+      container.style.minHeight = "297mm"; // A4 height
+      container.style.backgroundColor = "white";
+      container.style.padding = "0";
+      container.style.margin = "0";
+      container.style.boxSizing = "border-box";
       document.body.appendChild(container);
 
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait for fonts and layout to load
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const canvas = await html2canvas(container, {
         scale: 2,
         useCORS: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: "#ffffff",
+        width: container.offsetWidth,
+        height: container.offsetHeight,
+        logging: false,
       });
 
+      // A4 dimensions in points (72 DPI)
       const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: [794, 1123]
-      }) as jsPDF;
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
-      const imgData = canvas.toDataURL('image/png');
-      pdf.addImage(imgData, 'PNG', 0, 0, 794, 1123);
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Scale content to fit on single page if needed
+      let finalWidth = imgWidth;
+      let finalHeight = imgHeight;
+
+      if (imgHeight > pageHeight) {
+        // Scale down to fit on one page
+        const scale = pageHeight / imgHeight;
+        finalWidth = imgWidth * scale;
+        finalHeight = pageHeight;
+      }
+
+      // Center the content on the page
+      const xOffset = (imgWidth - finalWidth) / 2;
+      const yOffset = (pageHeight - finalHeight) / 2;
+
+      // Add single page with scaled content
+      pdf.addImage(
+        canvas.toDataURL("image/png"),
+        "PNG",
+        xOffset,
+        yOffset,
+        finalWidth,
+        finalHeight
+      );
 
       document.body.removeChild(container);
 
-      const fileName = `${resumeData.personalInfo?.fullName || 'Resume'}_Resume.pdf`;
+      const fileName = `${
+        resumeData.personalInfo?.fullName || "Resume"
+      }_Resume.pdf`;
       pdf.save(fileName);
-
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      throw new Error('Failed to generate PDF');
+      console.error("Error generating PDF:", error);
+      throw new Error("Failed to generate PDF");
     }
   }
 
   private static generateResumeHTML(data: ResumeContent): string {
     const formatDate = (dateString: string | undefined): string => {
-      if (!dateString) return '';
-      const date = new Date(dateString + '-01');
-      return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      if (!dateString) return "";
+      const date = new Date(dateString + "-01");
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      });
     };
 
     const personalInfo = data.personalInfo || {};
@@ -59,109 +99,393 @@ export class PDFGenerator {
     const certifications = data.certifications || [];
 
     return `
-      <div style="font-family: 'Arial', sans-serif; font-size: 9px; color: #111; max-width: 794px; margin: auto; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 6px;">
-          <h1 style="font-size: 16px; font-weight: bold; margin: 0;">${personalInfo.fullName || `${personalInfo.firstName || ''} ${personalInfo.lastName || ''}`}</h1>
-          <div style="font-size: 8px; color: #444;">
-            ${[personalInfo.location, personalInfo.email, personalInfo.phone, personalInfo.portfolio].filter(Boolean).join(' • ')}
+      <div style="
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        font-size: 11px; 
+        line-height: 1.3; 
+        color: #2d3748; 
+        max-width: 210mm; 
+        min-height: 297mm;
+        margin: 0; 
+        padding: 15mm;
+        box-sizing: border-box;
+        background: white;
+      ">
+        <!-- Header Section -->
+        <div style="text-align: center; margin-bottom: 15px; border-bottom: 2px solid #2d3748; padding-bottom: 10px;">
+          <h1 style="
+            font-size: 24px; 
+            font-weight: 700; 
+            margin: -10px 0 5px 0; 
+            color: #1a202c;
+            letter-spacing: 0.5px;
+          ">${
+            personalInfo.fullName ||
+            `${personalInfo.firstName || ""} ${personalInfo.lastName || ""}`
+          }</h1>
+          
+          <div style="font-size: 11px; color: #4a5568; margin-bottom: 3px;">
+            ${[personalInfo.email, personalInfo.phone, personalInfo.location]
+              .filter(Boolean)
+              .join(" • ")}
           </div>
-          <div style="font-size: 8px; color: #666;">
-            ${[personalInfo.linkedin, personalInfo.github].filter(Boolean).join(' • ')}
-          </div>
+          
+          ${
+            [
+              personalInfo.linkedin,
+              personalInfo.github,
+              personalInfo.portfolio,
+            ].filter(Boolean).length > 0
+              ? `
+            <div style="font-size: 10px; color: #718096;">
+              ${[
+                personalInfo.linkedin,
+                personalInfo.github,
+                personalInfo.portfolio,
+              ]
+                .filter(Boolean)
+                .join(" • ")}
+            </div>
+          `
+              : ""
+          }
         </div>
 
-        ${data.summary ? `
-          <div style="margin: 6px 0;">
-            <div style="font-weight: bold; border-bottom: 1px solid #000; font-size: 10px;">Summary</div>
-            <p style="margin: 2px 0; text-align: justify; font-size: 8px;">${data.summary}</p>
+        ${
+          data.summary
+            ? `
+          <div style="margin-bottom: 18px;">
+            <h2 style="
+              font-size: 14px; 
+              font-weight: 600; 
+              margin: -10px 0 8px 0; 
+              color: #2d3748;
+              border-bottom: 1px solid black;
+              padding-bottom: 10px;
+            ">PROFESSIONAL SUMMARY</h2>
+            <p style="
+              margin-top: -10px; 
+              text-align: justify; 
+              font-size: 11px; 
+              line-height: 1.4;
+              color: #4a5568;
+            ">${data.summary}</p>
           </div>
-        ` : ''}
+        `
+            : ""
+        }
 
-        ${workExperience.length > 0 ? `
-          <div style="margin-top: 8px;">
-            <div style="font-weight: bold; border-bottom: 1px solid #000; font-size: 10px;">Experience</div>
-            ${workExperience.map(exp => `
-              <div style="margin: 4px 0;">
-                <div style="display: flex; justify-content: space-between;">
-                  <div>
-                    <b>${exp.position}</b>, ${exp.company}
-                    ${exp.location ? ` – <span style="color: #444;">${exp.location}</span>` : ''}
+        ${
+          workExperience.length > 0
+            ? `
+          <div style="margin-bottom: 18px;">
+            <h2 style="
+              font-size: 14px; 
+              font-weight: 600; 
+              margin: -10px 0 10px 0; 
+              color: #2d3748;
+              border-bottom: 1px solid black;
+              padding-bottom: 10px;
+            ">PROFESSIONAL EXPERIENCE</h2>
+            
+            ${workExperience
+              .map(
+                (exp, index) => `
+              <div style="margin-bottom: ${
+                index === workExperience.length - 1 ? "0" : "14px"
+              };">
+                <div style="
+                  display: flex; 
+                  justify-content: space-between; 
+                  align-items: flex-start;
+                  margin: -10px 0 4px 0;
+                ">
+                  <div style="flex: 1;">
+                    <div style="
+                      font-weight: 600; 
+                      font-size: 12px; 
+                      color: #2d3748;
+                      margin: -3px 0 2px 0;
+                    ">${exp.position}</div>
+                    <div style="
+                      font-size: 11px; 
+                      color: #4a5568;
+                      font-style: italic;
+                    ">
+                      ${exp.company}${exp.location ? ` • ${exp.location}` : ""}
+                    </div>
                   </div>
-                  <div style="font-size: 7px; color: #666;">
-                    ${formatDate(exp.startDate)} - ${exp.current ? 'Present' : formatDate(exp.endDate)}
+                  <div style="
+                    font-size: 10px; 
+                    color: #718096;
+                    text-align: right;
+                    white-space: nowrap;
+                    margin-left: 10px;
+                  ">
+                    ${formatDate(exp.startDate)} - ${
+                  exp.current ? "Present" : formatDate(exp.endDate)
+                }
                   </div>
                 </div>
-                ${exp.description?.length ? `
-                  <ul style="margin: 2px 0 0 15px; padding: 0; font-size: 8px;">
-                    ${exp.description.filter(Boolean).map(d => `<li>${d}</li>`).join('')}
+                
+                ${
+                  exp.description?.length
+                    ? `
+                  <ul style="
+                    margin: 4px 0 0 0; 
+                     padding-left: 10px; 
+                    font-size: 10px;
+                    line-height: 1.4;
+                    
+                  ">
+                    ${exp.description
+                      .filter(Boolean)
+                      .map(
+                        (d) => `
+                     <div style="display:flex; align-items: center;">
+                     <p>•</p>
+                     <li style="margin-bottom: 1px; color: #4a5568;padding-left:2px">${d}</li>
+                      </div>
+                    `
+                      )
+                      .join("")}
                   </ul>
-                ` : ''}
+                `
+                    : ""
+                }
               </div>
-            `).join('')}
+            `
+              )
+              .join("")}
           </div>
-        ` : ''}
+        `
+            : ""
+        }
 
-        ${projects.length > 0 ? `
-          <div style="margin-top: 8px;">
-            <div style="font-weight: bold; border-bottom: 1px solid #000; font-size: 10px;">Projects</div>
-            ${projects.map(project => `
-              <div style="margin: 4px 0;">
-                <div style="display: flex; justify-content: space-between;">
-                  <b>${project.name}</b>
-                  ${project.github ? `<a href="${project.github}" style="font-size: 7px; color: #1D4ED8;">GitHub</a>` : ''}
+        ${
+          projects.length > 0
+            ? `
+          <div style="margin-bottom: 18px;">
+            <h2 style="
+              font-size: 14px; 
+              font-weight: 600; 
+              margin: -10px 0 2px 0; 
+              color: #2d3748;
+              border-bottom: 1px solid black;
+              padding-bottom: 10px;
+            ">PROJECTS</h2>
+            
+            ${projects
+              .map(
+                (project, index) => `
+              <div style="margin-bottom: ${
+                index === projects.length - 1 ? "0" : "8px"
+              };">
+                <div style="
+                  display: flex; 
+                  justify-content: space-between; 
+                  align-items: center;
+                  margin:-3px 0 4px 0;
+                ">
+                  <div style="
+                    font-weight: 600; 
+                    font-size: 12px; 
+                    color: #2d3748;
+                  ">${project.name}</div>
+                  ${
+                    project.github
+                      ? `
+                    <a href="${project.github}" style="
+                      font-size: 9px; 
+                      color: #3182ce;
+                      text-decoration: none;
+                    ">GitHub</a>
+                  `
+                      : ""
+                  }
                 </div>
-                <div style="font-size: 8px; margin-top: 2px;">${project.description || ''}</div>
-                ${project.technologies?.length ? `
-                  <div style="margin-top: 2px; font-size: 7px; color: #555;">
-                    Tools: ${project.technologies.join(', ')}
+                
+                ${
+                  project.description
+                    ? `
+                  <div style="
+                    font-size: 10px; 
+                    margin-bottom: 4px;
+                    color: #4a5568;
+                    line-height: 1.4;
+                  ">${project.description}</div>
+                `
+                    : ""
+                }
+                
+                ${
+                  project.technologies?.length
+                    ? `
+                  <div style="
+                    font-size: 9px; 
+                    color: #718096;
+                    font-style: italic;
+                  ">
+                    <strong>Technologies:</strong> ${project.technologies.join(
+                      ", "
+                    )}
                   </div>
-                ` : ''}
+                `
+                    : ""
+                }
               </div>
-            `).join('')}
+            `
+              )
+              .join("")}
           </div>
-        ` : ''}
+        `
+            : ""
+        }
 
-        <div style="display: flex; gap: 20px; margin-top: 10px;">
+        <!-- Two Column Layout for Education, Skills, and Certifications -->
+        <div style="; gap: 20px; margin-top: 5px;">
+          <!-- Left Column -->
           <div style="flex: 1;">
-            ${education.length > 0 ? `
-              <div>
-                <div style="font-weight: bold; border-bottom: 1px solid #000; font-size: 10px;">Education</div>
-                ${education.map(edu => `
-                  <div style="margin-top: 4px;">
-                    <b style="font-size: 9px;">${edu.degree}</b> ${edu.field ? `in ${edu.field}` : ''}<br/>
-                    <span style="font-size: 8px; color: #444;">${edu.institution}</span><br/>
-                    <span style="font-size: 7px; color: #666;">${formatDate(edu.startDate)} - ${edu.current ? 'Present' : formatDate(edu.endDate)}</span>
+            ${
+              education.length > 0
+                ? `
+              <div style="margin-bottom: 15px;">
+                <h2 style="
+                  font-size: 14px; 
+                  font-weight: 600; 
+                  margin: -10px 0 8px 0; 
+                  color: #2d3748;
+                  border-bottom: 1px solid black;
+                  padding-bottom: 10px;
+                ">EDUCATION</h2>
+                
+                ${education
+                  .map(
+                    (edu, index) => `
+                  <div style="margin-bottom: ${
+                    index === education.length - 1 ? "0" : "8px"
+                  };">
+                    <div style="
+                      font-weight: 600; 
+                      font-size: 11px; 
+                      color: #2d3748;
+                      margin:-4px 0 4px 0;
+                    ">${edu.degree}${edu.field ? ` in ${edu.field}` : ""}</div>
+                  <div style="display:flex;justify-content: space-between; align-items: center">  <div style="
+                      font-size: 10px; 
+                      color: #4a5568;
+                      margin:-2px 0 1px 0;
+                    ">${edu.institution}</div>
+                    <div style="
+                      font-size: 9px; 
+                      color: #718096;
+                    ">${formatDate(edu.startDate)} - ${
+                      edu.current ? "Present" : formatDate(edu.endDate)
+                    }</div>
+                  
                   </div>
-                `).join('')}
+                  </div>
+                    ${
+                      edu.gpa
+                        ? `
+                      <div style="font-size: 9px; color: #718096;">GPA: ${edu.gpa}</div>
+                    `
+                        : ""
+                    }
+                `
+                  )
+                  .join("")}
               </div>
-            ` : ''}
-          </div>
-          <div style="flex: 1;">
-            ${skills.length > 0 ? `
+            `
+                : ""
+            }
+
+            ${
+              certifications.length > 0
+                ? `
               <div>
-                <div style="font-weight: bold; border-bottom: 1px solid #000; font-size: 10px;">Skills</div>
-                <div style="font-size: 7.5px; margin-top: 4px;">
-                  ${skills.map(skill => `
-                    <span style="background: #eee; padding: 1px 3px; border-radius: 2px; margin-right: 2px;">
-                      ${typeof skill === 'string' ? skill : skill.name}
-                    </span>
-                  `).join('')}
+                <h2 style="
+                  font-size: 14px; 
+                  font-weight: 600; 
+                  margin: -12px 0 6px 0; 
+                  color: #2d3748;
+                  border-bottom: 1px solid black;
+                  padding-bottom: 10px;
+                ">CERTIFICATIONS</h2>
+                
+                ${certifications
+                  .map(
+                    (cert, index) => `
+                  <div style="margin-bottom: ${
+                    index === certifications.length - 1 ? "0" : "8px"
+                  };">
+                    <div style="
+                      font-weight: 600; 
+                      font-size: 11px; 
+                      color: #2d3748;
+                      margin:-4px 0 0px 0;
+                    ">${cert.name}</div>
+                                  <div style="display:flex;justify-content: space-between; align-items: center"> 
+                    <div style="
+                      font-size: 10px; 
+                      color: #4a5568;
+                      margin-bottom: 1px;
+                    ">${cert.issuer}</div>
+                    <div style="
+                      font-size: 9px; 
+                      color: #718096;
+                    ">${formatDate(cert.date)}</div>
+                  </div>
+                  </div>
+                `
+                  )
+                  .join("")}
+              </div>
+            `
+                : ""
+            }
+          </div>
+
+          <div style="margin-top:2px">
+            ${
+              skills.length > 0
+                ? `
+              <div>
+                <h2 style="
+                  font-size: 14px; 
+                  font-weight: 600; 
+                  margin: 0 0 8px 0; 
+                  color: #2d3748;
+                  border-bottom: 1px solid black;
+                  padding-bottom: 10px;
+                ">TECHNICAL SKILLS</h2>
+                
+                <div style="
+                  font-size: 10px; 
+                  line-height: 1.6;
+                  color: #4a5568;
+                ">
+                  ${skills
+                    .map((skill, index) => {
+                      const skillName =
+                        typeof skill === "string" ? skill : skill.name;
+                      return `<span style="
+                      background: #f7fafc; 
+                      border: 1px solid #e2e8f0;
+                      padding: 2px 6px; 
+                      border-radius: 3px; 
+                      margin: 0 4px 4px 0;
+                      display: inline-block;
+                      font-size: 9px;
+                      color: #2d3748;
+                    ">${skillName}</span>`;
+                    })
+                    .join("")}
                 </div>
               </div>
-            ` : ''}
-
-            ${certifications.length > 0 ? `
-              <div style="margin-top: 8px;">
-                <div style="font-weight: bold; border-bottom: 1px solid #000; font-size: 10px;">Certifications</div>
-                ${certifications.map(cert => `
-                  <div style="margin-top: 4px;">
-                    <b style="font-size: 9px;">${cert.name}</b><br/>
-                    <span style="font-size: 8px; color: #444;">${cert.issuer}</span><br/>
-                    <span style="font-size: 7px; color: #666;">${formatDate(cert.date)}</span>
-                  </div>
-                `).join('')}
-              </div>
-            ` : ''}
+            `
+                : ""
+            }
           </div>
         </div>
       </div>
