@@ -1,29 +1,34 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Navbar from './components/Layout/Navbar';
-import LandingPage from './pages/LandingPage';
-import SignIn from './components/Auth/SignIn';
-import SignUp from './components/Auth/SignUp';
-import Dashboard from './components/Dashboard/Dashboard';
-import ResumeBuilder from './components/ResumeBuilder/ResumeBuilder';
-import ResumePreview from './components/ResumeBuilder/ResumePreview';
-import TemplatesPage from './pages/TemplatesPage';
-import FeaturesPage from './pages/FeaturesPage';
-import PricingPage from './pages/PricingPage';
-import ProfilePage from './pages/ProfilePage';
+
+// Lazy-loaded components
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const SignIn = lazy(() => import('./components/Auth/SignIn'));
+const SignUp = lazy(() => import('./components/Auth/SignUp'));
+const Dashboard = lazy(() => import('./components/Dashboard/Dashboard'));
+const ResumeBuilder = lazy(() => import('./components/ResumeBuilder/ResumeBuilder'));
+const ResumePreview = lazy(() => import('./components/ResumeBuilder/ResumePreview'));
+const TemplatesPage = lazy(() => import('./pages/TemplatesPage'));
+const FeaturesPage = lazy(() => import('./pages/FeaturesPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return user ? <>{children}</> : <Navigate to="/signin" />;
@@ -34,11 +39,7 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return !user ? <>{children}</> : <Navigate to="/dashboard" />;
@@ -48,76 +49,78 @@ const AppContent: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/templates" element={<TemplatesPage />} />
-        <Route path="/features" element={<FeaturesPage />} />
-        <Route path="/pricing" element={<PricingPage />} />
-        
-        {/* Auth Routes */}
-        <Route 
-          path="/signin" 
-          element={
-            <PublicRoute>
-              <SignIn />
-            </PublicRoute>
-          } 
-        />
-        <Route 
-          path="/signup" 
-          element={
-            <PublicRoute>
-              <SignUp />
-            </PublicRoute>
-          } 
-        />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/templates" element={<TemplatesPage />} />
+          <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          
+          {/* Auth Routes */}
+          <Route 
+            path="/signin" 
+            element={
+              <PublicRoute>
+                <SignIn />
+              </PublicRoute>
+            } 
+          />
+          <Route 
+            path="/signup" 
+            element={
+              <PublicRoute>
+                <SignUp />
+              </PublicRoute>
+            } 
+          />
 
-        {/* Protected Routes */}
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/builder" 
-          element={
-            <ProtectedRoute>
-              <ResumeBuilder />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/builder/:id" 
-          element={
-            <ProtectedRoute>
-              <ResumeBuilder />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/preview/:id" 
-          element={
-            <ProtectedRoute>
-              <ResumePreview />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/profile" 
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          } 
-        />
+          {/* Protected Routes */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/builder" 
+            element={
+              <ProtectedRoute>
+                <ResumeBuilder />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/builder/:id" 
+            element={
+              <ProtectedRoute>
+                <ResumeBuilder />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/preview/:id" 
+            element={
+              <ProtectedRoute>
+                <ResumePreview />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } 
+          />
 
-        {/* Catch all route */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+          {/* Catch all route */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Suspense>
       <Toaster position="top-right" />
     </div>
   );
