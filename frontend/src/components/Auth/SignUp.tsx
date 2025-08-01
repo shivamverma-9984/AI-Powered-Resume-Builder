@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useActionState } from 'react'; // React 19+ feature
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Eye, EyeOff, Mail, Lock, User, FileText, Sparkles, Shield, CheckCircle } from 'lucide-react';
@@ -7,46 +8,47 @@ import toast from 'react-hot-toast';
 const SignUp: React.FC = () => {
   const { signUp } = useAuth();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
+  // Action handler for form submission
+  const signUpAction = async (prevState: any, formData: FormData) => {
+    const fullName = formData.get('fullName') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    // Client-side validation
+    if (password !== confirmPassword) {
+      return { error: 'Passwords do not match' };
     }
 
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
-      return;
+    if (password.length < 6) {
+      return { error: 'Password must be at least 6 characters' };
     }
-
-    setLoading(true);
 
     try {
-      const { error } = await signUp(formData.fullName, formData.email, formData.password);
-      
+      const { error } = await signUp(fullName, email, password);
       if (error) {
-        toast.error(error.message);
-      } else {
-        toast.success('Account created successfully!');
-        navigate('/dashboard');
+        return { error: error.message };
       }
+      toast.success('Account created successfully!');
+      navigate('/dashboard');
+      return { success: true };
     } catch (error) {
-      toast.error('An error occurred. Please try again.');
-    } finally {
-      setLoading(false);
+      return { error: 'An error occurred. Please try again.' };
     }
   };
+
+  // Using useActionState to handle form state
+  const [state, formAction, isPending] = useActionState(signUpAction, null);
+
+  // Show error toast if there's an error
+  useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state]);
 
   const benefits = [
     { icon: Sparkles, text: 'AI-Powered Resume Enhancement' },
@@ -154,7 +156,7 @@ const SignUp: React.FC = () => {
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form action={formAction} className="space-y-6">
                   {/* Full Name Field */}
                   <div className="group">
                     <label htmlFor="fullName" className="block text-sm font-semibold text-purple-200 mb-2">
@@ -171,8 +173,7 @@ const SignUp: React.FC = () => {
                         required
                         className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
                         placeholder="Enter your full name"
-                        value={formData.fullName}
-                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        
                       />
                     </div>
                   </div>
@@ -193,8 +194,7 @@ const SignUp: React.FC = () => {
                         required
                         className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
                         placeholder="Enter your email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                       
                       />
                     </div>
                   </div>
@@ -215,8 +215,7 @@ const SignUp: React.FC = () => {
                         required
                         className="w-full pl-10 pr-12 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
                         placeholder="Create a password"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                       
                       />
                       <button
                         type="button"
@@ -244,8 +243,7 @@ const SignUp: React.FC = () => {
                         required
                         className="w-full pl-10 pr-12 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
                         placeholder="Confirm your password"
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      
                       />
                       <button
                         type="button"
@@ -260,12 +258,12 @@ const SignUp: React.FC = () => {
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={isPending}
                     className="group relative w-full overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-2xl font-bold text-lg hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-400/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/25"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <span className="relative flex items-center justify-center">
-                      {loading ? (
+                      {isPending ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3"></div>
                           Creating account...
