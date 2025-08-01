@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useActionState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Eye, EyeOff, Mail, Lock, FileText, Sparkles, Shield, CheckCircle, Zap, Users, Award } from 'lucide-react';
@@ -8,36 +7,32 @@ import toast from 'react-hot-toast';
 const SignIn: React.FC = () => {
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const signInAction = async (prevState: any, formData: FormData) => {
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
-    // Client-side validation
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters');
-      return { error: 'Password must be at least 6 characters' };
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      const { error } = await signIn(email, password);
+      const { error } = await signIn(formData.email, formData.password);
       
       if (error) {
         toast.error(error.message);
-        return { error: error.message };
       } else {
         toast.success('Welcome back!');
         navigate('/dashboard');
-        return { success: true };
       }
     } catch (error) {
       toast.error('An error occurred. Please try again.');
-      return { error: 'An error occurred. Please try again.' };
+    } finally {
+      setLoading(false);
     }
   };
-
-  const [state, formAction, isPending] = useActionState(signInAction, null);
 
   const benefits = [
     { icon: Zap, text: 'Lightning-Fast Resume Creation' },
@@ -152,7 +147,7 @@ const SignIn: React.FC = () => {
                   </p>
                 </div>
 
-                <form action={formAction} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Email Field */}
                   <div className="group">
                     <label htmlFor="email" className="block text-sm font-semibold text-purple-200 mb-2">
@@ -169,6 +164,8 @@ const SignIn: React.FC = () => {
                         required
                         className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
                         placeholder="Enter your email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       />
                     </div>
                   </div>
@@ -189,6 +186,8 @@ const SignIn: React.FC = () => {
                         required
                         className="w-full pl-10 pr-12 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
                         placeholder="Enter your password"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       />
                       <button
                         type="button"
@@ -224,12 +223,12 @@ const SignIn: React.FC = () => {
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    disabled={isPending}
+                    disabled={loading}
                     className="group relative w-full overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-2xl font-bold text-lg hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-400/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/25"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <span className="relative flex items-center justify-center">
-                      {isPending ? (
+                      {loading ? (
                         <>
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3"></div>
                           Signing in...
