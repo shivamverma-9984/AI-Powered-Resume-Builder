@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FileText, User, LogOut, Settings, Menu, X, Sparkles } from "lucide-react";
+import {
+  FileText,
+  User,
+  LogOut,
+  Settings,
+  Menu,
+  X,
+  Sparkles,
+} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { useState } from "react";
 import toast from "react-hot-toast";
 
 const Navbar: React.FC = () => {
@@ -21,26 +28,28 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200">
+    <nav className="bg-white shadow-lg border-b border-gray-200 relative z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-           <Link to="/" className="group flex items-center sm:space-x-3 relative">
-                <div className="relative">
-                  <div className=" hidden sm:flex w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl  items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg group-hover:shadow-2xl group-hover:shadow-purple-500/25">
-                    <FileText className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full  items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Sparkles className="w-2 h-2  text-white" />
-                  </div>
-                </div>
-                <div>
-                  <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-purple-900 to-pink-900 bg-clip-text text-transparent group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-300">
-                    ResumeAI
-                  </span>
-                  <div className="text-xs text-gray-500 font-medium -mt-1">AI-Powered</div>
-                </div>
-              </Link>
+          <Link to="/" className="group flex items-center sm:space-x-3 relative">
+            <div className="relative">
+              <div className="hidden sm:flex w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg group-hover:shadow-2xl group-hover:shadow-purple-500/25">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Sparkles className="w-2 h-2 text-white" />
+              </div>
+            </div>
+            <div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-purple-900 to-pink-900 bg-clip-text text-transparent group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-300">
+                ResumeAI
+              </span>
+              <div className="text-xs text-gray-500 font-medium -mt-1">
+                AI-Powered
+              </div>
+            </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -64,13 +73,13 @@ const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* User Menu */}
+          {/* User Menu & Mobile Button */}
           <div className="flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-4">
                 <Link
                   to="/dashboard"
-                  className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25 flex items-center space-x-2"
+                  className="group relative bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25"
                 >
                   Dashboard
                 </Link>
@@ -111,7 +120,7 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link
                   to="/signup"
-                   className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2  hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-bold shadow-lg"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-bold shadow-lg"
                 >
                   Sign Up
                 </Link>
@@ -120,65 +129,105 @@ const Navbar: React.FC = () => {
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden  rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 p-2"
+              onClick={() => setIsMenuOpen(true)}
             >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              <Menu className="h-6 w-6" />
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4">
-            <div className="flex flex-col space-y-4">
-              <Link
-                to="/templates"
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Templates
-              </Link>
-              <Link
-                to="/features"
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Features
-              </Link>
-              <Link
-                to="/pricing"
-                className="text-gray-700 hover:text-blue-600 transition-colors"
-              >
-                Pricing
-              </Link>
-              {!user && (
-                <div className="pt-4 border-t border-gray-200">
-                  <Link
-                    to="/signin"
-                    className="block w-full text-center bg-gray-100 text-gray-700 px-4 py-2  hover:bg-gray-200 transition-colors mb-2"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    to="/signup"
-                       className="block w-full text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3  hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-bold shadow-lg"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
+      {/* =========================
+          Mobile Side Drawer + Overlay
+      =========================== */}
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${
+          isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setIsMenuOpen(false)}
+      ></div>
+
+      {/* Side Drawer */}
+      <div
+        className={`fixed top-0 left-0 w-96 h-full bg-white shadow-lg z-50 transform transition-transform duration-300 ${
+          isMenuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex justify-between items-center p-4 border-b">
+          <Link to="/" className="group flex items-center sm:space-x-3 relative">
+            <div className="relative">
+              <div className="hidden sm:flex w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl items-center justify-center group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg group-hover:shadow-2xl group-hover:shadow-purple-500/25">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <Sparkles className="w-2 h-2 text-white" />
+              </div>
             </div>
-          </div>
-        )}
+            <div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-purple-900 to-pink-900 bg-clip-text text-transparent group-hover:from-purple-600 group-hover:to-pink-600 transition-all duration-300">
+                ResumeAI
+              </span>
+              <div className="text-xs text-gray-500 font-medium -mt-1">
+                AI-Powered
+              </div>
+            </div>
+          </Link>
+          <button onClick={() => setIsMenuOpen(false)}>
+            <X className="h-6 w-6 text-gray-700" />
+          </button>
+        </div>
+
+        <div className="flex flex-col p-4 space-y-4">
+          <Link
+            to="/templates"
+            onClick={() => setIsMenuOpen(false)}
+            className="text-gray-700 hover:text-blue-600 transition-colors"
+          >
+            Templates
+          </Link>
+          <Link
+            to="/features"
+            onClick={() => setIsMenuOpen(false)}
+            className="text-gray-700 hover:text-blue-600 transition-colors"
+          >
+            Features
+          </Link>
+          <Link
+            to="/pricing"
+            onClick={() => setIsMenuOpen(false)}
+            className="text-gray-700 hover:text-blue-600 transition-colors"
+          >
+            Pricing
+          </Link>
+
+          {!user && (
+            <div className="pt-4 border-t border-gray-200 space-y-2">
+              <Link
+                to="/signin"
+                onClick={() => setIsMenuOpen(false)}
+                className="block text-center bg-gray-100 text-gray-700 px-4 py-2 hover:bg-gray-200 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/signup"
+                onClick={() => setIsMenuOpen(false)}
+                className="block text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3 hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-bold shadow-lg"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );
 };
 
 export default Navbar;
+
 
 
 
