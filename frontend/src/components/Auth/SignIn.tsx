@@ -60,36 +60,25 @@ const SignIn: React.FC = () => {
       <div className="absolute top-40 right-20 w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full animate-bounce delay-700"></div>
       <div className="absolute bottom-40 left-20 w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl rotate-45 animate-bounce delay-1000"></div>
 
-      <div className="relative min-h-screen flex">
+      <div className="relative min-h-screen flex -mt-9">
         {/* Left Side - Welcome Back */}
         <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12">
           <div className="max-w-md">
-            <div className="mb-8">
-              <Link to="/" className="inline-flex items-center space-x-3 group">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <FileText className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-3xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-                  ResumeAI
-                </span>
-              </Link>
-            </div>
-
-            <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
               Welcome Back to
-              <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mt-1">
                 Your Success
               </span>
             </h1>
 
-            <p className="text-xl text-purple-100 mb-12 leading-relaxed">
+            <p className="text-xl text-purple-100 mb-8">
               Continue building amazing resumes and landing your dream jobs with the power of AI.
             </p>
 
-            <div className="space-y-6 mb-12">
+            <div className="space-y-4">
               {benefits.map((benefit, index) => (
-                <div key={index} className="flex items-center space-x-4 group">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-purple-400/20 group-hover:scale-110 transition-transform duration-300">
+                <div key={index} className="flex items-center space-x-3 group">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm  flex items-center justify-center border border-purple-400/20 group-hover:scale-110 transition-transform duration-300">
                     <benefit.icon className="h-6 w-6 text-purple-300" />
                   </div>
                   <span className="text-purple-100 font-medium text-lg">
@@ -100,10 +89,10 @@ const SignIn: React.FC = () => {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4 mt-6">
               {stats.map((stat, index) => (
                 <div key={index} className="group relative">
-                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:bg-white/10 transition-all duration-300 transform hover:scale-105">
+                  <div className="bg-white/5 backdrop-blur-sm p-4 border border-white/10 hover:bg-white/10 transition-all duration-300 transform hover:scale-105">
                     <div className={`w-8 h-8 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-2 mx-auto group-hover:rotate-12 transition-transform duration-300`}>
                       <stat.icon className="w-4 h-4 text-white" />
                     </div>
@@ -134,11 +123,11 @@ const SignIn: React.FC = () => {
             </div>
 
             {/* Form Card */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl"></div>
-              <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-4 md:p-8 border border-white/20 shadow-2xl">
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-white mb-1">Welcome Back</h2>
+             <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl "></div>
+              <div className="relative bg-white/10 back p-4 md:px-8 border border-white/20 shadow-2xl">
+                <div className="text-center mb-6">
+                  <h2 className="text-3xl font-bold text-white ">Create Account</h2>
                   <p className="text-purple-200">
                     Don't have an account?{' '}
                     <Link to="/signup" className="text-purple-300 hover:text-purple-100 font-semibold transition-colors duration-300 underline decoration-purple-400/50 hover:decoration-purple-300">
@@ -147,14 +136,14 @@ const SignIn: React.FC = () => {
                   </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Email Field */}
-                  <div className="group">
-                    <label htmlFor="email" className="block text-sm font-semibold text-purple-200 mb-2">
+                  <div className="group -mt-2">
+                    <label htmlFor="email" className="block text-sm font-semibold text-purple-200 mb-1.5">
                       Email Address
                     </label>
                     <div className="relative">
-                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+                      <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10">
                         <Mail className="h-5 w-5 text-purple-300 group-focus-within:text-purple-200 transition-colors duration-300" />
                       </div>
                       <input
@@ -162,7 +151,7 @@ const SignIn: React.FC = () => {
                         name="email"
                         type="email"
                         required
-                        className="w-full pl-10 pr-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
+                        className="w-full pl-8 pr-4 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
                         placeholder="Enter your email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -172,11 +161,11 @@ const SignIn: React.FC = () => {
 
                   {/* Password Field */}
                   <div className="group">
-                    <label htmlFor="password" className="block text-sm font-semibold text-purple-200 mb-2">
+                    <label htmlFor="password" className="block text-sm font-semibold text-purple-200 mb-1.5">
                       Password
                     </label>
                     <div className="relative">
-                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+                      <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10">
                         <Lock className="h-5 w-5 text-purple-300 group-focus-within:text-purple-200 transition-colors duration-300" />
                       </div>
                       <input
@@ -184,14 +173,14 @@ const SignIn: React.FC = () => {
                         name="password"
                         type={showPassword ? 'text' : 'password'}
                         required
-                        className="w-full pl-10 pr-12 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
+                        className="w-full pl-8 pr-12 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-purple-400/50 transition-all duration-300 hover:bg-white/15"
                         placeholder="Enter your password"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       />
                       <button
                         type="button"
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-purple-300 hover:text-purple-200 transition-colors duration-300 z-10"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-300 hover:text-purple-200 transition-colors duration-300 z-10"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -224,7 +213,7 @@ const SignIn: React.FC = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="group relative w-full overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-6 rounded-2xl font-bold text-lg hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-400/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/25"
+                    className="group relative w-full overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2.5 px-6 font-semibold text-lg hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-400/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/25"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     <span className="relative flex items-center justify-center">
@@ -257,7 +246,7 @@ const SignIn: React.FC = () => {
                   {/* Sign Up Link */}
                   <Link
                     to="/signup"
-                    className="group relative w-full overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20 text-white py-3 px-6 rounded-2xl font-bold text-lg hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center"
+                    className="group relative w-full overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20 text-white py-2.5 px-6 font-bold text-lg hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center"
                   >
                     <span className="relative flex items-center">
                       Create Account
