@@ -127,7 +127,7 @@ const SignIn: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl "></div>
               <div className="relative bg-white/10 back p-4 md:px-8 border border-white/20 shadow-2xl">
                 <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold text-white ">Create Account</h2>
+                  <h2 className="text-3xl font-bold text-white ">Login Account</h2>
                   <p className="text-purple-200">
                     Don't have an account?{' '}
                     <Link to="/signup" className="text-purple-300 hover:text-purple-100 font-semibold transition-colors duration-300 underline decoration-purple-400/50 hover:decoration-purple-300">

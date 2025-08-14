@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Eye, EyeOff, Mail, Lock, User, Sparkles, Shield, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Sparkles, Shield, CheckCircle, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const SignUp: React.FC = () => {
@@ -117,6 +117,17 @@ const SignUp: React.FC = () => {
         {/* Right Side - Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 ">
           <div className="w-full max-w-md">
+            {/* Mobile Logo */}
+            <div className="lg:hidden text-center mb-8">
+              <Link to="/" className="inline-flex items-center space-x-3 group">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-3xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                  ResumeAI
+                </span>
+              </Link>
+              </div>
             {/* Form Card */}
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl "></div>
